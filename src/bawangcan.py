@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import Select
 
 def process_category(all_event_url,driver):
     total=len(all_event_url)
-    print "开始报名"+str(total)+"个活动..."
+    print("开始报名"+str(total)+"个活动...")
     cnt=0
     no=0
     for url in all_event_url:
@@ -20,6 +20,7 @@ def process_category(all_event_url,driver):
         try:
             big_btn=driver.find_element_by_class_name("big-btn")
             if big_btn.text.find(u'取消报名')!=-1 or big_btn.text.find(u'已报名')!=-1:
+                print(str(no) + " already:" + url[1])
                 continue
             big_btn.click()
 
@@ -29,26 +30,48 @@ def process_category(all_event_url,driver):
                 sel.select_by_index(1)                
             except:
                 pass
-
-            time.sleep(2)            
+            store_name = ""
+            try:
+                store_name = driver.find_element_by_class_name("tenant").text
+                l = store_name.find("(")
+                store_name = store_name[l + 1:]
+                store_name = store_name.replace("...", "")
+                store_name = store_name.replace(")", "")
+            except:
+                pass
+            time.sleep(1.5)
             ok=driver.find_element_by_id("J_pop_ok")
+            flag = ""
+
+            try:
+                select = Select(driver.find_element_by_class_name("J_branch"))
+                for i in range(select.options.__len__()):
+                    st = select.options[i].text
+                    if st.find(store_name) != -1:
+                        select.select_by_index(i)
+                        flag = st
+                        break
+                if flag == "":
+                    select.select_by_index(1)
+            except:
+                pass
             ok.click()
             cnt+=1
-            print str(cnt)+" success:"+url[1].encode('gbk','ignore')
-        except Exception, e:
-            print str(no)+' failed:'+url[1].encode('gbk','ignore')
-            print format(e)
+            print(str(no)+" success:"+url[1] + flag)
+        except Exception as e:
+            print(str(no)+' failed:'+url[1])
+            print(format(e))
         time.sleep(1)
     return
 
 def main():
-    print '正在执行……'
+    print('正在执行……')
     skiptext=[u"牙",u"齿",u"搬家",u"口腔"]
 
-    print sys.argv
-    print len(sys.argv)
+    print(sys.argv)
+    print(len(sys.argv))
     dper= sys.argv[1]
-    print "your dper is:"+dper
+    print("your dper is:"+dper)
     
     opts = Options()
     opts.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.86 Safari/537.36")
@@ -63,6 +86,7 @@ def main():
     tabs=driver.find_element_by_class_name('s-fix-wrap').find_elements_by_tag_name('div')
     
     all_event_url=[]
+
     for tab in tabs:
         if tab.text.find(u'全部')!=-1:
             continue
@@ -85,7 +109,7 @@ def main():
                     if s in title.text:
                         continue
                 all_event_url.append((str(event_url),title.text))                    
-    
+
     process_category(all_event_url, driver)
               
     driver.quit()
