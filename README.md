@@ -13,7 +13,9 @@
 首先用电脑访问大众点评霸王餐页面，登录你的账号，把`cookie`拷贝出来。仔细看，`cookie`里面有一个`dper`字段，把它的值作为脚本的参数运行就行了。
 >如 python xxxxx.py d38baa6dbee1f081e4fd6c9a3eb6ca3d7b2ca7d9
 
-
+## 更新 by xiyuecangxin
+>@2020.10
+1. 自动选择门店，匹配店名中的店名
 
 ## 更新 by Master_13
 >@20180115
